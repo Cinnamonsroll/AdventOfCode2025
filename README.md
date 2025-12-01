@@ -1,0 +1,1 @@
+My 2025 Advent Of Code solutions in Typescript!
