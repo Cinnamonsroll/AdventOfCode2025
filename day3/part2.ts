@@ -18,9 +18,6 @@ for (const line of lines) {
     if (maxId >= arrayOfNumbers.length) break;
     let max = arrayOfNumbers.at(maxId)!;
     let upperBound = arrayOfNumbers.length - (poweredBatteries - i - 1);
-    if (upperBound > arrayOfNumbers.length) {
-      upperBound = arrayOfNumbers.length;
-    }
     for (let j = maxId + 1; j < upperBound; j++) {
       if (arrayOfNumbers.at(j)! > max) {
         max = arrayOfNumbers.at(j)!;
