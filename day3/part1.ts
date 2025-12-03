@@ -4,7 +4,7 @@ type Line = `${number}`;
 const inputFile = "input.txt";
 
 const fileContent = fs.readFileSync(inputFile, "utf-8");
-const lines = fileContent.trim().split("\n") as Line[];
+const lines = fileContent.split(/\s+/g) as Line[];
 
 let joltageSum = 0;
 

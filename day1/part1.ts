@@ -5,7 +5,7 @@ type Line = `${"L" | "R"}${number}`;
 const inputFile = "input.txt";
 
 const fileContent = fs.readFileSync(inputFile, "utf-8");
-const lines = fileContent.trim().split("\n") as Line[];
+const lines = fileContent.trim().split(/\s+/g) as Line[];
 
 let dial = 50;
 

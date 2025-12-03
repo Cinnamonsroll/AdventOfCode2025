@@ -4,12 +4,12 @@ type Line = `${number}`;
 const inputFile = "input.txt";
 
 const fileContent = fs.readFileSync(inputFile, "utf-8");
-const lines = fileContent.trim().split("\n") as Line[];
+const lines = fileContent.split(/\s+/g) as Line[];
 
 let joltageSum = 0;
 
 for (const line of lines) {
-  const arrayOfNumbers = line.trim().split("").map(Number)
+  const arrayOfNumbers = line.split("").map(Number)
   let currentLargestJoltage = 0;
   let maxId = -1;
   const poweredBatteries = 12;
