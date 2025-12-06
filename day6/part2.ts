@@ -30,36 +30,30 @@ function parseInput(lines: string[]): string[][] {
   return result;
 }
 
-function transformProblem(problem: string[]): string[] {
+function transformProblem(problem: string[]): (string | number)[] {
   const numbers = problem.slice(0, -1);
   const operator = problem.at(-1)!;
 
-  const output: string[] = [];
+  const output: (string | number)[] = []
 
   for (let i = operator.length - 1; i >= 0; i--) {
     let column = "";
     for (const num of numbers) {
       column += num[i] ?? " ";
     }
-    output.push(column);
+    output.push(Number(column));
   }
 
-  output.push(operator);
+  output.push(operator.trim());
   return output;
 }
 
 const problems = parseInput(lines).map(transformProblem);
 
-const parsed = problems.map(problem =>
-  problem.map(part => {
-    const clean = part.replace(/ /g, "");
-    return clean === "*" || clean === "+" ? clean : Number(clean)
-  })
-);
 
 let grandTotal = 0;
 
-for (const problem of parsed) {
+for (const problem of problems) {
   const operator = problem.at(-1) as "+" | "*";
   const numbers = problem.slice(0, -1) as number[];
 
