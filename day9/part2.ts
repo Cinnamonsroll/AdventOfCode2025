@@ -1,84 +1,76 @@
 import * as fs from "fs";
 
-const inputLines = fs.readFileSync("input.txt", "utf8").trim().split(/\r?\n/);
-const n = inputLines.length;
-const poly: [number, number][] = inputLines.map((line) => {
-  const [x, y] = line.split(",").map(Number);
-  return [x, y] as [number, number];
-});
+interface Edge {
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+}
+
+type Tile = [number, number];
+
+const input = fs.readFileSync("input.txt", "utf8").trim().split(/\r?\n/);
 
 let maxArea = 0;
 
-for (let i = 0; i < n; i++) {
-  const [ax, ay] = poly[i]!;
-  for (let j = i + 1; j < n; j++) {
-    const [bx, by] = poly[j]!;
-    const x1 = Math.min(ax, bx),
-      x2 = Math.max(ax, bx);
-    const y1 = Math.min(ay, by),
-      y2 = Math.max(ay, by);
-    const area = (x2 - x1 + 1) * (y2 - y1 + 1);
+const redTiles: Tile[] = [];
+const edges: Edge[] = [];
 
-    if (area <= maxArea) continue;
+const [initX, initY] = input[0]!.split(",").map(Number) as [number, number];
+const [lastX, lastY] = input.at(-1)!.split(",").map(Number) as [number, number];
 
-    let valid = true;
+for (let i = 0; i < input.length - 1; i++) {
+  const [fX, fY] = input[i]!.split(",").map(Number);
+  const [tX, tY] = input[i + 1]!.split(",").map(Number);
+  if(!fX || !fY || !tX || !tY) continue;
 
-    for (let k = 0; k < 4 && valid; k++) {
-      const cx = k & 1 ? x2 : x1,
-        cy = k & 2 ? y2 : y1;
-      let inside = false;
+  edges.push({ x1: fX, y1: fY, x2: tX, y2: tY });
+  redTiles.push([fX, fY], [tX, tY]);
+}
 
-      for (let m = 0; m < n; m++) {
-        const [x1p, y1p] = poly[m]!,
-          [x2p, y2p] = poly[(m + 1) % n]!;
-        const cross = (x2p - x1p) * (cy - y1p) - (y2p - y1p) * (cx - x1p);
 
-        if (
-          cross === 0 &&
-          cx >= Math.min(x1p, x2p) &&
-          cx <= Math.max(x1p, x2p) &&
-          cy >= Math.min(y1p, y2p) &&
-          cy <= Math.max(y1p, y2p)
-        ) {
-          inside = true;
-          break;
-        }
+edges.push({ x1: initX, y1: initY, x2: lastX, y2: lastY });
 
-        if (y1p > cy !== y2p > cy) {
-          const xInt = ((x2p - x1p) * (cy - y1p)) / (y2p - y1p) + x1p;
-          if (cx < xInt) inside = !inside;
-        }
-      }
+function intersects(minX: number, minY: number, maxX: number, maxY: number): boolean {
+  for (const e of edges) {
+    const iMinX = Math.min(e.x1, e.x2);
+    const iMaxX = Math.max(e.x1, e.x2);
+    const iMinY = Math.min(e.y1, e.y2);
+    const iMaxY = Math.max(e.y1, e.y2);
+    if (minX < iMaxX && maxX > iMinX && minY < iMaxY && maxY > iMinY) return true;
+  }
+  return false;
+}
 
-      if (!inside) valid = false;
+function manhattan(a: Tile, b: Tile): number {
+  return Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]);
+}
+
+function rectangleArea(x1: number, y1: number, x2: number, y2: number): number {
+  const minX = Math.min(x1, x2);
+  const maxX = Math.max(x1, x2);
+  const minY = Math.min(y1, y2);
+  const maxY = Math.max(y1, y2);
+  return (maxX - minX + 1) * (maxY - minY + 1);
+}
+
+for (let i = 0; i < redTiles.length - 1; i++) {
+  const a = redTiles[i]!;
+  for (let j = i; j < redTiles.length; j++) {
+    const b = redTiles[j]!;
+
+    const minX = Math.min(a[0], b[0]);
+    const maxX = Math.max(a[0], b[0]);
+    const minY = Math.min(a[1], b[1]);
+    const maxY = Math.max(a[1], b[1]);
+
+    const m = manhattan(a, b);
+    if (m * m <= maxArea) continue;
+
+    if (!intersects(minX, minY, maxX, maxY)) {
+      const area = rectangleArea(a[0], a[1], b[0], b[1]);
+      if (area > maxArea) maxArea = area;
     }
-
-    if (!valid) continue;
-
-    const rEdges: [[number, number, number, number]][] = [
-      [[x1, y1, x2, y1]],
-      [[x2, y1, x2, y2]],
-      [[x2, y2, x1, y2]],
-      [[x1, y2, x1, y1]],
-    ];
-
-    for (let e = 0; e < 4 && valid; e++) {
-      const [rx1, ry1, rx2, ry2] = rEdges[e]![0];
-
-      for (let m = 0; m < n && valid; m++) {
-        const [px1, py1] = poly[m]!,
-          [px2, py2] = poly[(m + 1) % n]!;
-
-        const v1 = (rx2 - rx1) * (py1 - ry1) - (ry2 - ry1) * (px1 - rx1);
-        const v2 = (rx2 - rx1) * (py2 - ry1) - (ry2 - ry1) * (px2 - rx1);
-        const v3 = (px2 - px1) * (ry1 - py1) - (py2 - py1) * (rx1 - px1);
-        const v4 = (px2 - px1) * (ry2 - py1) - (py2 - py1) * (rx2 - px1);
-
-        if (v1 * v2 < 0 && v3 * v4 < 0) valid = false;
-      }
-    }
-
-    if (valid) maxArea = area;
   }
 }
 
