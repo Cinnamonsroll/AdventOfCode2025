@@ -4,7 +4,7 @@ const inputLines = fs.readFileSync("input.txt", "utf8").trim().split(/\r?\n/);
 const n = inputLines.length;
 const poly: [number, number][] = inputLines.map((line) => {
   const [x, y] = line.split(",").map(Number);
-  return [x, y];
+  return [x, y] as [number, number];
 });
 
 let maxArea = 0;
