@@ -29,8 +29,8 @@ for (let i = 0; i < n; i++) {
       let inside = false;
 
       for (let m = 0; m < n; m++) {
-        const [x1p, y1p] = poly[m],
-          [x2p, y2p] = poly[(m + 1) % n];
+        const [x1p, y1p] = poly[m]!,
+          [x2p, y2p] = poly[(m + 1) % n]!;
         const cross = (x2p - x1p) * (cy - y1p) - (y2p - y1p) * (cx - x1p);
 
         if (
@@ -66,8 +66,8 @@ for (let i = 0; i < n; i++) {
       const [rx1, ry1, rx2, ry2] = rEdges[e]![0];
 
       for (let m = 0; m < n && valid; m++) {
-        const [px1, py1] = poly[m],
-          [px2, py2] = poly[(m + 1) % n];
+        const [px1, py1] = poly[m]!,
+          [px2, py2] = poly[(m + 1) % n]!;
 
         const v1 = (rx2 - rx1) * (py1 - ry1) - (ry2 - ry1) * (px1 - rx1);
         const v2 = (rx2 - rx1) * (py2 - ry1) - (ry2 - ry1) * (px2 - rx1);
